@@ -6,24 +6,42 @@ const Inquiry = require("../models/Inquiry");
 
 /* ================= SAVE INQUIRY ================= */
 
-router.post("/", async (req, res) => {
+router.post("/signup", async (req, res) => {
 
   try {
 
-    const inquiry = new Inquiry(req.body);
+    const { name, email, password } = req.body;
 
-    await inquiry.save();
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+
+      return res.status(400).json({
+        message: "User already exists",
+      });
+
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = new User({
+      name,
+      email,
+      password: hashedPassword,
+    });
+
+    await user.save();
 
     res.status(201).json({
-      success: true,
-      message: "Inquiry Submitted Successfully",
+      message: "Signup Successful",
     });
 
   } catch (error) {
 
+    console.log(error);
+
     res.status(500).json({
-      success: false,
-      message: "Server Error",
+      error: error.message
     });
 
   }
