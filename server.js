@@ -4,6 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
+const PORT = process.env.PORT || 5000;
 
 /* ================= MIDDLEWARE ================= */
 
@@ -16,15 +17,18 @@ app.use(express.json());
 
 /* ================= DATABASE CONNECTION ================= */
 
-mongoose
-  .connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB Connected");
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+
   })
   .catch((err) => {
     console.log("Database Error:", err);
   });
-
 /* ================= TEST ROUTE ================= */
 
 app.get("/", (req, res) => {
@@ -39,10 +43,3 @@ app.use("/api/auth", authRoutes);
 const inquiryRoutes = require("./routes/inquiryRoutes");
 
 app.use("/api/inquiry", inquiryRoutes);
-
-/* ================= SERVER ================= */
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});

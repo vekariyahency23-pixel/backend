@@ -1,13 +1,14 @@
-
 const express = require("express");
-const router = express.Router();
 
 const bcrypt = require("bcryptjs");
+
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
 
-/* SIGNUP */
+const router = express.Router();
+
+/* ================= SIGNUP ================= */
 
 router.post("/signup", async (req, res) => {
 
@@ -15,26 +16,32 @@ router.post("/signup", async (req, res) => {
 
     const { name, email, password } = req.body;
 
-    // CHECK USER
+    /* CHECK USER */
 
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
+
       return res.status(400).json({
         message: "User already exists",
       });
+
     }
 
-    // HASH PASSWORD
+    /* HASH PASSWORD */
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // CREATE USER
+    /* CREATE USER */
 
     const user = new User({
+
       name,
+
       email,
+
       password: hashedPassword,
+
     });
 
     await user.save();
@@ -43,20 +50,19 @@ router.post("/signup", async (req, res) => {
       message: "Signup Successful",
     });
 
-  }
-catch (error) {
+  } catch (error) {
 
-  console.log(error);
+    console.log(error);
 
-  res.status(500).json({
-    error: error.message
-  });
+    res.status(500).json({
+      message: "Server Error",
+    });
 
   }
 
 });
 
-/* LOGIN */
+/* ================= LOGIN ================= */
 
 router.post("/login", async (req, res) => {
 
@@ -64,13 +70,19 @@ router.post("/login", async (req, res) => {
 
     const { email, password } = req.body;
 
+    /* FIND USER */
+
     const user = await User.findOne({ email });
 
     if (!user) {
+
       return res.status(400).json({
-        message: "User not found",
+        message: "Invalid Email",
       });
+
     }
+
+    /* CHECK PASSWORD */
 
     const isMatch = await bcrypt.compare(
       password,
@@ -78,20 +90,41 @@ router.post("/login", async (req, res) => {
     );
 
     if (!isMatch) {
+
       return res.status(400).json({
         message: "Invalid Password",
       });
+
     }
 
+    /* JWT TOKEN */
+
     const token = jwt.sign(
-      { id: user._id },
-      "secretkey",
-      { expiresIn: "7d" }
+
+      {
+        id: user._id,
+      },
+
+      process.env.JWT_SECRET,
+
+      {
+        expiresIn: "7d",
+      }
+
     );
 
-    res.json({
+    res.status(200).json({
+
       message: "Login Successful",
+
       token,
+
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+
     });
 
   } catch (error) {
