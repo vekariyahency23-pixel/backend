@@ -7,7 +7,11 @@ const app = express();
 
 /* ================= MIDDLEWARE ================= */
 
-app.use(cors());
+app.use(cors({
+    origin:"*"
+}
+    
+));
 app.use(express.json());
 
 /* ================= DATABASE CONNECTION ================= */
@@ -28,6 +32,9 @@ app.get("/", (req, res) => {
 });
 
 /* ================= ROUTES ================= */
+const authRoutes = require("./routes/authRoutes");
+
+app.use("/api/auth", authRoutes);
 
 const inquiryRoutes = require("./routes/inquiryRoutes");
 
