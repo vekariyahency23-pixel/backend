@@ -9,7 +9,9 @@ const PORT = process.env.PORT || 5000;
 /* ================= MIDDLEWARE ================= */
 
 app.use(cors({
-    origin:"*"
+    origin:"*",
+      methods: ["GET", "POST", "PUT", "DELETE"],
+
 }
     
 ));

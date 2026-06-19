@@ -1,9 +1,49 @@
 const express = require("express");
+
 const router = express.Router();
 
-router.post("/", (req, res) => {
-  console.log(req.body);
-  res.json({ message: "Inquiry received" });
+const Inquiry = require("../models/Inquiry");
+
+/* ================= SAVE INQUIRY ================= */
+
+router.post("/", async (req, res) => {
+
+  try {
+
+    const inquiry = new Inquiry(req.body);
+
+    await inquiry.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Inquiry Submitted Successfully",
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+
+  }
+router.post("/", async (req, res) => {
+  console.log("INQUIRY HIT:", req.body);
+
+  try {
+    const inquiry = new Inquiry(req.body);
+    await inquiry.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Inquiry Submitted Successfully",
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
 });
 
 module.exports = router;
