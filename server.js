@@ -6,19 +6,14 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-/* ================= MIDDLEWARE ================= */
-
 app.use(cors({
-    origin:"*",
-      methods: ["GET", "POST", "PUT", "DELETE"],
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE"]
+}));
 
-}
-    
-));
 app.use(express.json());
 
-/* ================= DATABASE CONNECTION ================= */
-
+// DB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB Connected");
@@ -26,22 +21,15 @@ mongoose.connect(process.env.MONGO_URI)
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
-
   })
   .catch((err) => {
     console.log("Database Error:", err);
   });
-/* ================= TEST ROUTE ================= */
 
+// Routes
 app.get("/", (req, res) => {
-  res.send("Backend Running Successfully");
+  res.send("Backend Running");
 });
 
-/* ================= ROUTES ================= */
-const authRoutes = require("./routes/authRoutes");
-
-app.use("/api/auth", authRoutes);
-
-const inquiryRoutes = require("./routes/inquiryRoutes");
-
-app.use("/api/inquiry", inquiryRoutes);
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/inquiry", require("./routes/inquiryRoutes"));
