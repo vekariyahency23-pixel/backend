@@ -21,6 +21,18 @@ router.post("/signup", async (req, res) => {
       return res.status(400).json({
         message: "User already exists",
       });
+      const { name, email, password, role } = req.body;
+      const user = new User({
+
+  name,
+
+  email,
+
+  password: hashedPassword,
+
+  role,
+
+});
     }
 
     // hash password
@@ -74,8 +86,10 @@ router.post("/login", async (req, res) => {
 
     // create token
     const token = jwt.sign(
-      { id: user._id },
-      JWT_SECRET,
+      { id: user._id,
+role: user.role },
+process.env.JWT_SECRET,
+
       { expiresIn: "7d" }
     );
 
